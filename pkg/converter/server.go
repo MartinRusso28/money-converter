@@ -23,7 +23,7 @@ func GetMainEngine(repo r.Repository) *gin.Engine {
 	
 	router.GET("/exchanges/repo/convert",env.setConvertParams, env.repoConvertExchange)
 	router.GET("/exchanges/repo/", env.getRepoEnabledExchanges)
-	
+	router.POST("/exchanges/sum/", env.getMonies, env.sumMoney)
 
 	return router
 }
@@ -139,6 +139,25 @@ func (env environment) repoConvertExchange(context *gin.Context) {
 	env.respond(context, response)
 }
 
+
+func (env environment) getMonies(context *gin.Context) {
+	moniesRequest := moniesRequest{}
+	context.BindJSON(&moniesRequest)
+
+	for _,v := range moniesRequest.monies {
+		if !v.Valid() {
+			env.badRequest(context)
+			return
+		}
+	}
+
+	context.Set("monies", moniesRequest.monies)
+}
+
+func (env environment) sumMoney(context *gin.Context) {
+
+}
+
 func (env environment) respond(c *gin.Context, response network.Response) {
 	obj := gin.H{}
 
@@ -167,4 +186,8 @@ func (env environment) internalServerError(context *gin.Context, err error) {
 	})
 
 	context.Abort()
+}
+
+type moniesRequest struct {
+	monies []model.Money
 }
