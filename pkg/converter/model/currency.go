@@ -6,8 +6,8 @@ import (
 
 //Currency contains ID and Description of a Currency.
 type Currency struct {
-	CurrencyCode string `valid:"required, length(3|3)"`
-	Rate         float64  `json:"-" `
+	CurrencyCode string  `valid:"required, length(3|3)"`
+	Rate         float64 `json:"-" `
 }
 
 //Valid currency struct.

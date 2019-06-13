@@ -28,12 +28,12 @@ func (api APIRateStrategy) GetRate(fromCode string) (float64, error) {
 
 //RepositoryRateStrategy -
 type RepositoryRateStrategy struct {
-	repo r.Repository
+	Repo r.Repository
 }
 
 //GetRate -
 func (repoSt RepositoryRateStrategy) GetRate(fromCode string) (float64, error) {
-	newRate, err := repoSt.repo.Money.GetRate(fromCode)
+	newRate, err := repoSt.Repo.Money.GetRate(fromCode)
 
 	if err != nil {
 		return -1, err

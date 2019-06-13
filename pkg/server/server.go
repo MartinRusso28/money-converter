@@ -1,13 +1,16 @@
-package moneyconverter
+package moneysrv
 
 import (
-	"money-converter/pkg/converter/model"
-	r "money-converter/internal/repository"
-	"github.com/gin-gonic/gin"
-	"strconv"
 	"errors"
 	"money-converter/internal/network"
-	"money-converter/pkg/rates"
+	r "money-converter/internal/repository"
+	"money-converter/pkg/converter/model"
+	"money-converter/pkg/adder"
+	"money-converter/pkg/converter"
+	ratescalc "money-converter/pkg/rates"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 //GetMainEngine return money converter's server.
@@ -18,12 +21,13 @@ func GetMainEngine(repo r.Repository) *gin.Engine {
 
 	env := environment{repo: repo}
 
-	router.GET("/exchanges/api/convert",env.setConvertParams, env.apiConvertExchange)
-	router.GET("/exchanges/api/", env.getAPIEnabledExchanges)
+	router.GET("/exchanges/api/convert", env.setConvertParams, env.apiConvertExchange)
+	router.GET("/exchanges/api", env.getAPIEnabledExchanges)
+	router.POST("/exchanges/api/sum", env.getMonies, env.sumMoney)
+
+	router.GET("/exchanges/repo/convert", env.setConvertParams, env.repoConvertExchange)
+	router.GET("/exchanges/repo", env.getRepoEnabledExchanges)
 	
-	router.GET("/exchanges/repo/convert",env.setConvertParams, env.repoConvertExchange)
-	router.GET("/exchanges/repo/", env.getRepoEnabledExchanges)
-	router.POST("/exchanges/sum/", env.getMonies, env.sumMoney)
 
 	return router
 }
@@ -32,7 +36,7 @@ type environment struct {
 	repo r.Repository
 }
 
-func (env environment) getAPIEnabledExchanges(context *gin.Context){
+func (env environment) getAPIEnabledExchanges(context *gin.Context) {
 	enabledEx, err := ratescalc.GetEnabledExchanges()
 
 	if err != nil {
@@ -42,15 +46,15 @@ func (env environment) getAPIEnabledExchanges(context *gin.Context){
 	env.respondEnabledExchanges(context, enabledEx)
 }
 
-func (env environment) getRepoEnabledExchanges(context *gin.Context){
+func (env environment) getRepoEnabledExchanges(context *gin.Context) {
 	enabledEx := env.repo.Money.GetEnabledExchanges()
 	env.respondEnabledExchanges(context, enabledEx)
 }
 
-func (env environment) respondEnabledExchanges(context *gin.Context, exchanges []string){
+func (env environment) respondEnabledExchanges(context *gin.Context, exchanges []string) {
 	response := network.Response{
 		StatusCode: 200,
-		Body: exchanges,
+		Body:       exchanges,
 	}
 
 	env.respond(context, response)
@@ -63,7 +67,7 @@ func (env environment) setConvertParams(context *gin.Context) {
 
 	moneyAmountFormatted, err := strconv.Atoi(moneyAmount)
 
-	if err != nil || fromCurrency == "" || toCurrency == "" || moneyAmountFormatted <= 0{
+	if err != nil || fromCurrency == "" || toCurrency == "" || moneyAmountFormatted <= 0 {
 		env.badRequest(context)
 		return
 	}
@@ -82,14 +86,14 @@ func (env environment) apiConvertExchange(context *gin.Context) {
 
 	fromMoney := model.Money{
 		Amount: float64(amount),
-		Currency:model.Currency{
+		Currency: model.Currency{
 			CurrencyCode: context.GetString("from"),
 		},
 	}
 
-	converter := CurrencyConverter{
-		RateStrategy: APIRateStrategy{},
-		ToCurrency : toCurrency,
+	converter := moneyconverter.CurrencyConverter{
+		RateStrategy: moneyconverter.APIRateStrategy{},
+		ToCurrency:   toCurrency,
 	}
 
 	convertedMoney, err := converter.Convert(&fromMoney)
@@ -100,7 +104,7 @@ func (env environment) apiConvertExchange(context *gin.Context) {
 
 	response := network.Response{
 		StatusCode: 200,
-		Body: convertedMoney,
+		Body:       convertedMoney,
 	}
 
 	env.respond(context, response)
@@ -115,14 +119,14 @@ func (env environment) repoConvertExchange(context *gin.Context) {
 
 	fromMoney := model.Money{
 		Amount: float64(amount),
-		Currency:model.Currency{
+		Currency: model.Currency{
 			CurrencyCode: context.GetString("from"),
 		},
 	}
 
-	converter := CurrencyConverter{
-		RateStrategy: RepositoryRateStrategy{env.repo},
-		ToCurrency : toCurrency,
+	converter := moneyconverter.CurrencyConverter{
+		RateStrategy: moneyconverter.RepositoryRateStrategy{env.repo},
+		ToCurrency:   toCurrency,
 	}
 
 	convertedMoney, err := converter.Convert(&fromMoney)
@@ -133,29 +137,63 @@ func (env environment) repoConvertExchange(context *gin.Context) {
 
 	response := network.Response{
 		StatusCode: 200,
-		Body: convertedMoney,
+		Body:       convertedMoney,
 	}
 
 	env.respond(context, response)
 }
 
-
 func (env environment) getMonies(context *gin.Context) {
-	moniesRequest := moniesRequest{}
-	context.BindJSON(&moniesRequest)
+	moniesRequest := SumParams{}
+	err := context.BindJSON(&moniesRequest)
 
-	for _,v := range moniesRequest.monies {
+	if err != nil {
+		panic(err)
+	}
+
+	for _, v := range moniesRequest.Monies {
 		if !v.Valid() {
 			env.badRequest(context)
 			return
 		}
 	}
 
-	context.Set("monies", moniesRequest.monies)
+	context.Set("monies", moniesRequest.Monies)
+	context.Set("toCurrency", moniesRequest.ToCurrency)
 }
 
 func (env environment) sumMoney(context *gin.Context) {
+	monies, exists := context.Get("monies")
+	toCurrency := context.GetString("toCurrency")
 
+	if !exists {
+		env.badRequest(context)
+	}
+
+	apiConverter := moneyconverter.CurrencyConverter{
+		RateStrategy: moneyconverter.APIRateStrategy{},
+		ToCurrency: model.Currency{
+			CurrencyCode: toCurrency,
+		},
+	}
+
+	moneyAdder := moneyadder.MoneyAdder{
+		CurrencyConverter: apiConverter,
+		Monies: monies.([]model.Money),
+	}
+
+	result, err := moneyAdder.CalculateSumResult()
+
+	if err != nil {
+		env.internalServerError(context, err)
+	}
+
+	response := network.Response {
+		StatusCode: 200,
+		Body: result,
+	}
+
+	env.respond(context, response)
 }
 
 func (env environment) respond(c *gin.Context, response network.Response) {
@@ -188,6 +226,8 @@ func (env environment) internalServerError(context *gin.Context, err error) {
 	context.Abort()
 }
 
-type moniesRequest struct {
-	monies []model.Money
+//SumParams -
+type SumParams struct {
+	Monies []model.Money `json:"monies"`
+	ToCurrency string
 }

@@ -6,7 +6,7 @@ import (
 
 //Money -
 type Money struct {
-	Amount float64 
+	Amount float64
 	Currency
 }
 

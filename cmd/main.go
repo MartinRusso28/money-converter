@@ -2,7 +2,7 @@ package main
 
 import (
 	"money-converter/internal/repository/sqlite"
-	"money-converter/pkg/converter"
+	"money-converter/pkg/server"
 	"os"
 	"github.com/joho/godotenv"
 
@@ -19,7 +19,7 @@ func main() {
 
 	db := sqlite.GetDatabase()
 
-	server := moneyconverter.GetMainEngine(db)
+	server := moneysrv.GetMainEngine(db)
 
 	err = server.Run(":" + os.Getenv("PORT"))
 
