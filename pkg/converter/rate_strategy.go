@@ -1,8 +1,8 @@
 package moneyconverter
 
 import (
-	"money-converter/pkg/rates"
-	r "money-converter/internal/repository"
+	"github.com/MartinRusso28/money-converter/pkg/rates"
+	r "github.com/MartinRusso28/money-converter/internal/repository"
 )
 
 

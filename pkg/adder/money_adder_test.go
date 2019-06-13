@@ -2,8 +2,8 @@ package moneyadder
 
 import(
 	"testing"
-	"money-converter/pkg/converter"
-	"money-converter/pkg/converter/model"
+	"github.com/MartinRusso28/money-converter/pkg/converter"
+	"github.com/MartinRusso28/money-converter/pkg/converter/model"
 	"github.com/stretchr/testify/assert"
 	"money-converter/test"
 )

@@ -1,8 +1,8 @@
 package mock
 
 import (
-	"money-converter/pkg/converter/model"
-	"money-converter/internal/repository"
+	"github.com/MartinRusso28/money-converter/pkg/converter/model"
+	"github.com/MartinRusso28/money-converter/internal/repository"
 	"errors"
 )
 

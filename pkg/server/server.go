@@ -2,12 +2,12 @@ package moneysrv
 
 import (
 	"errors"
-	"money-converter/internal/network"
-	r "money-converter/internal/repository"
-	"money-converter/pkg/converter/model"
-	"money-converter/pkg/adder"
-	"money-converter/pkg/converter"
-	ratescalc "money-converter/pkg/rates"
+	"github.com/MartinRusso28/money-converter/internal/network"
+	r "github.com/MartinRusso28/money-converter/internal/repository"
+	"github.com/MartinRusso28/money-converter/pkg/converter/model"
+	"github.com/MartinRusso28/money-converter/pkg/adder"
+	"github.com/MartinRusso28/money-converter/pkg/converter"
+	ratescalc "github.com/MartinRusso28/money-converter/pkg/rates"
 	"strconv"
 
 	"github.com/gin-gonic/gin"

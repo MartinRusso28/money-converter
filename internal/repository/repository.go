@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"money-converter/pkg/converter/model"
+	"github.com/MartinRusso28/money-converter/pkg/converter/model"
 )
 
 //Repository for storing data.

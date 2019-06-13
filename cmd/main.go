@@ -1,8 +1,8 @@
 package main
 
 import (
-	"money-converter/internal/repository/sqlite"
-	"money-converter/pkg/server"
+	"github.com/MartinRusso28/money-converter/internal/repository/sqlite"
+	"github.com/MartinRusso28/money-converter/pkg/server"
 	"os"
 	"github.com/joho/godotenv"
 

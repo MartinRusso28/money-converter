@@ -1,7 +1,7 @@
 package moneyconverter
 
 import (
-	"money-converter/pkg/converter/model"
+	"github.com/MartinRusso28/money-converter/pkg/converter/model"
 	"money-converter/test"
 	"github.com/stretchr/testify/assert"
 	"testing"

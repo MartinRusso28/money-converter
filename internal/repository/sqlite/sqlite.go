@@ -1,8 +1,8 @@
 package sqlite
 
 import (
-	"money-converter/pkg/converter/model"
-	r "money-converter/internal/repository"
+	"github.com/MartinRusso28/money-converter/pkg/converter/model"
+	r "github.com/MartinRusso28/money-converter/internal/repository"
 	
 	"errors"
 	"github.com/jinzhu/gorm"

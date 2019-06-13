@@ -1,7 +1,7 @@
 package moneyconverter
 
 import (
-	"money-converter/pkg/converter/model"
+	"github.com/MartinRusso28/money-converter/pkg/converter/model"
 )
 
 //CurrencyConverter is a struct used for convert money to a another exchange.

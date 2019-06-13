@@ -1,8 +1,8 @@
 package moneyadder
 
 import(
-	"money-converter/pkg/converter"
-	"money-converter/pkg/converter/model"
+	"github.com/MartinRusso28/money-converter/pkg/converter"
+	"github.com/MartinRusso28/money-converter/pkg/converter/model"
 )
 
 //MoneyAdder is a struct used for sum different types of exchanges.
