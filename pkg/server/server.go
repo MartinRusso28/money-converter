@@ -23,11 +23,11 @@ func GetMainEngine(repo r.Repository) *gin.Engine {
 
 	router.GET("/exchanges/api/convert", env.setConvertParams, env.apiConvertExchange)
 	router.GET("/exchanges/api", env.getAPIEnabledExchanges)
-	router.POST("/exchanges/api/sum", env.getMonies, env.sumMoney)
+	router.POST("/exchanges/api/sum", env.getMonies, env.apiSumMoney)
 
 	router.GET("/exchanges/repo/convert", env.setConvertParams, env.repoConvertExchange)
 	router.GET("/exchanges/repo", env.getRepoEnabledExchanges)
-	
+	router.POST("/exchanges/repo/sum", env.getMonies, env.repoSumMoney)
 
 	return router
 }
@@ -125,7 +125,7 @@ func (env environment) repoConvertExchange(context *gin.Context) {
 	}
 
 	converter := moneyconverter.CurrencyConverter{
-		RateStrategy: moneyconverter.RepositoryRateStrategy{env.repo},
+		RateStrategy: moneyconverter.RepositoryRateStrategy{Repo: env.repo},
 		ToCurrency:   toCurrency,
 	}
 
@@ -162,7 +162,7 @@ func (env environment) getMonies(context *gin.Context) {
 	context.Set("toCurrency", moniesRequest.ToCurrency)
 }
 
-func (env environment) sumMoney(context *gin.Context) {
+func (env environment) apiSumMoney(context *gin.Context) {
 	monies, exists := context.Get("monies")
 	toCurrency := context.GetString("toCurrency")
 
@@ -195,6 +195,41 @@ func (env environment) sumMoney(context *gin.Context) {
 
 	env.respond(context, response)
 }
+
+func (env environment) repoSumMoney(context *gin.Context) {
+	monies, exists := context.Get("monies")
+	toCurrency := context.GetString("toCurrency")
+
+	if !exists {
+		env.badRequest(context)
+	}
+
+	repoConverter := moneyconverter.CurrencyConverter{
+		RateStrategy: moneyconverter.RepositoryRateStrategy{Repo: env.repo},
+		ToCurrency: model.Currency{
+			CurrencyCode: toCurrency,
+		},
+	}
+
+	moneyAdder := moneyadder.MoneyAdder{
+		CurrencyConverter: repoConverter,
+		Monies: monies.([]model.Money),
+	}
+
+	result, err := moneyAdder.CalculateSumResult()
+
+	if err != nil {
+		env.internalServerError(context, err)
+	}
+
+	response := network.Response {
+		StatusCode: 200,
+		Body: result,
+	}
+
+	env.respond(context, response)
+}
+
 
 func (env environment) respond(c *gin.Context, response network.Response) {
 	obj := gin.H{}
