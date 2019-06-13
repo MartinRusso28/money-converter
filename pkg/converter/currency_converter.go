@@ -4,13 +4,13 @@ import (
 	"money-converter/pkg/converter/model"
 )
 
-//CurrencyConverter -
+//CurrencyConverter is a struct used for convert money to a another exchange.
 type CurrencyConverter struct {
-	RateStrategy RateStrategy
+	RateStrategy RaterStrategy
 	ToCurrency          model.Currency
 }
 
-//Convert -
+//Convert return the converted money.
 func (cc CurrencyConverter) Convert(from *model.Money) (*model.Money, error) {
 	fromRate, err := cc.RateStrategy.GetRate(from.CurrencyCode)
 

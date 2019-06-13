@@ -6,16 +6,16 @@ import (
 )
 
 
-//RateStrategy -
-type RateStrategy interface {
+//RaterStrategy is an interface that define different ways of get the rates of the exchanges.
+type RaterStrategy interface {
 	GetRate(fromCode string) (float64, error)
 }
 
-//APIRateStrategy -
+//APIRateStrategy calcualte the rate using an external API.
 type APIRateStrategy struct {
 }
 
-//GetRate -
+//GetRate return the rate of a exchange using an external API.
 func (api APIRateStrategy) GetRate(fromCode string) (float64, error) {
 	newRate, err := ratescalc.GetExchangeRate(fromCode)
 
@@ -26,12 +26,12 @@ func (api APIRateStrategy) GetRate(fromCode string) (float64, error) {
 	return newRate, nil
 }
 
-//RepositoryRateStrategy -
+//RepositoryRateStrategy calculate the rate using a repository.
 type RepositoryRateStrategy struct {
 	Repo r.Repository
 }
 
-//GetRate -
+//GetRate return the rate of a exchange using a repository.
 func (repoSt RepositoryRateStrategy) GetRate(fromCode string) (float64, error) {
 	newRate, err := repoSt.Repo.Money.GetRate(fromCode)
 

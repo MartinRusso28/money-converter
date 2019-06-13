@@ -49,11 +49,11 @@ func (hc sqliteHealth) Check() error {
 	return database.DB().Ping()
 }
 
-//MoneyRepository -
+//MoneyRepository handle all the business logic of the exchanges.
 type MoneyRepository struct {
 }
 
-//GetRate -
+//GetRate return a rate that is stored in the sqlite DB.
 func (moneyRepo MoneyRepository) GetRate(exchangeName string) (float64, error) {
 	var rates []model.Currency
 
@@ -66,7 +66,7 @@ func (moneyRepo MoneyRepository) GetRate(exchangeName string) (float64, error) {
 	return rates[0].Rate, nil
 }
 
-//GetEnabledExchanges -
+//GetEnabledExchanges return all the rates that are stored in the sqlite DB.-
 func (moneyRepo MoneyRepository) GetEnabledExchanges() ([]string) {
 	var currencies []model.Currency
 	var exchanges []string
@@ -80,7 +80,7 @@ func (moneyRepo MoneyRepository) GetEnabledExchanges() ([]string) {
 	return exchanges
 }
 
-//AddCurrency -
+//AddCurrency to the sqlite DB.
 func (moneyRepo MoneyRepository) AddCurrency(currency model.Currency) error {
 	err := database.Save(currency).GetErrors()
 

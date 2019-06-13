@@ -4,7 +4,7 @@ import (
 	"github.com/asaskevich/govalidator"
 )
 
-//Money -
+//Money represent a coin with amount and currency.
 type Money struct {
 	Amount float64
 	Currency

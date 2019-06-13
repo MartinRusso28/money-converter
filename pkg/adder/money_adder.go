@@ -5,18 +5,18 @@ import(
 	"money-converter/pkg/converter/model"
 )
 
-//MoneyAdder -
+//MoneyAdder is a struct used for sum different types of exchanges.
 type MoneyAdder struct {
 	moneyconverter.CurrencyConverter
 	Monies []model.Money
 }
 
-//AddMoney -
+//AddMoney to the moneyAdder.
 func (adder *MoneyAdder) AddMoney(money model.Money){
 	adder.Monies = append(adder.Monies, money)
 }
 
-//CalculateSumResult -
+//CalculateSumResult return the sum of all the monies that are in the money adder.
 func (adder *MoneyAdder) CalculateSumResult() (float64, error) {
 	var result float64
 

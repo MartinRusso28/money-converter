@@ -4,7 +4,7 @@ import (
 	"github.com/asaskevich/govalidator"
 )
 
-//Currency contains ID and Description of a Currency.
+//Currency contains CurrencyCode and Rate of a Currency.
 type Currency struct {
 	CurrencyCode string  `valid:"required, length(3|3)"`
 	Rate         float64 `json:"-" `

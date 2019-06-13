@@ -49,7 +49,7 @@ func GetExchangeRate(currencyName string) (float64, error) {
 	return exchange, nil
 }
 
-//GetEnabledExchanges -
+//GetEnabledExchanges return a list of all the availables exchanges.
 func GetEnabledExchanges() ([]string, error) {
 	var exchanges []string
 
