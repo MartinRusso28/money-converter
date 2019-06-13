@@ -6,7 +6,7 @@ This program is a service that let you sum different exchanges.
 
 ## To run it:
 
-1) Create .env file with the "PORT" field that you are going to run the server.
+1) Create .env file with the "PORT" field that you are going to run the server inside the /cmd directory.
 2) cd cmd
 3) go run main.go
 
